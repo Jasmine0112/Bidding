@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -8,8 +9,21 @@ router.get('/', function(req, res, next) {
 
 
 router.get('/map', function(req, res, next) {
-  res.render('map', { title: 'Map' });
+  res.render('map', { title: 'myMap' });
 });
+
+router.get('/register', function(req, res, next){
+	res.render('register', {title: 'Register'});	 
+});
+
+
+router.post('/register-process', function(req, res, next){
+
+
+
+	res.render('register', {title: 'Register'});	 
+});
+
 
 
 
