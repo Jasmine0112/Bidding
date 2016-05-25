@@ -1,6 +1,7 @@
+CREATE DATABASE  `bidding_project`;
 USE `bidding_project`;
 
-CREATE TABLE `manufacturer regristration` (
+CREATE TABLE `Users` (
 	`id` Int( 11 ) AUTO_INCREMENT NOT NULL,
 	`email` VARCHAR( 255 ) NOT NULL,
 	`password` VARCHAR( 255 ) NOT NULL,
@@ -11,6 +12,5 @@ CREATE TABLE `manufacturer regristration` (
 	`Streetaddress` VARCHAR( 255 ) NOT NULL,
 	`State` VARCHAR( 255 ) NOT NULL,
 	`country` VARCHAR( 255 ) NOT NULL,
-	`product` VARCHAR( 255 ) NOT NULL,
-	`catorgory` VARCHAR( 255 ) NOT NULL,
+	`Industry` VARCHAR( 255 ) NOT NULL,
 	PRIMARY KEY ( `id` ) );
