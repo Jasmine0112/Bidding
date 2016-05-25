@@ -19,7 +19,6 @@ connection.connect(function(err) {
     console.log('connected as id ' + connection.threadId);
 });
 
-module.exports = connection;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -28,7 +27,19 @@ router.get('/', function(req, res, next) {
 
 <!--note to self put hbs file name int he section after render. hsb ending needed-->
 router.get('/map', function(req, res, next) {
-  res.render('map', { title: 'Map' });
+  res.render('map', { title: 'myMap' });
+});
+
+router.get('/register', function(req, res, next){
+	res.render('register', {title: 'Register'});	 
+});
+
+
+router.post('/register-process', function(req, res, next){
+
+
+
+	res.render('register', {title: 'Register'});	 
 });
 
 router.get('/buyer', function(req, res, next) {
@@ -51,5 +62,6 @@ router.get('/Regristration', function(req, res, next) {
 router.post('/Regristration', function(req, res, next) {
 	connection.query('INSERT INTO users (Insert all form fields but a common each) values(req.body value name')
  });
+
 
 module.exports = router;
