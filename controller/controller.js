@@ -1,67 +1,156 @@
 var express = require('express');
 var router = express.Router();
 
+
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    port: 3306,
-    host: 'localhost',
-    user: 'root',
-    password: "Ibrahim02",
-    database: "bidding_project"
+   port: 3306,
+   host: 'localhost',
+   user: 'root',
+   password: "1111",
+   database: "bidding_project"
 });
 
 
 connection.connect(function(err) {
-    if (err) {
-        console.error('error connecting: ' + err.stack);
-        return;
-    }
-    console.log('connected as id ' + connection.threadId);
+   if (err) {
+       console.error('error connecting: ' + err.stack);
+       return;
+   }
+   console.log('connected as id ' + connection.threadId);
 });
 
+//module.exports = connection;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+ res.render('index', { title: 'CustomRize'});
 });
 
-<!--note to self put hbs file name int he section after render. hsb ending needed-->
+
+//<!--note to self put hbs file name int he section after render. hsb ending needed-->
 router.get('/map', function(req, res, next) {
-  res.render('map', { title: 'myMap' });
-});
-
-router.get('/register', function(req, res, next){
-	res.render('register', {title: 'Register'});	 
-});
-
-
-router.post('/register-process', function(req, res, next){
-
-
-
-	res.render('register', {title: 'Register'});	 
+ res.render('map', { title: 'Map' });
 });
 
 router.get('/buyer', function(req, res, next) {
-  res.render('UserlandingPage', { title: 'Buyer' });
+  console.log(req.session);
+  if(req.session.logged_in!=true){
+      res.redirect("/login");
+  }else{
+    res.render('UserlandingPage', { title: 'Buyer' });
+  }
+
 });
 
 router.get('/Manufacturer', function(req, res, next) {
-	connection.query('select * from table name  WHERE colume=?',[req.session.instudy], function (error, results, fields) {
 
 
+console.log(req.session);
+if(req.session.logged_in!=true){
+    res.redirect("/login");
+}else{
+  if(req.session.user_type=="manufacturer"){
+    res.render('ManufacturerLandingPage', {title: 'Manufacturer'});
+  }else{
+    res.render('login', {user_message: 'Sorry you\'re not a manufacturer.'});
+  }
+}
+
+});
+
+router.get('/Manufacturerform ', function(req,res, next){
   res.render('ManfacturerLandingPage', { data: results });
-
-	})
 });
 
-router.get('/Regristration', function(req, res, next) {
-  res.render('Regristrationpage', { title: 'Regristration' });
+
+ //<!-- connection.query('select * from table name  WHERE colume=?',[req.session.instudy], function (error, results, fields) {-->
+
+
+router.get('/register', function(req, res, next) {
+ res.render('RegristrationPage', { title: 'Regristration' });
 });
 
-router.post('/Regristration', function(req, res, next) {
-	connection.query('INSERT INTO users (Insert all form fields but a common each) values(req.body value name')
- });
+router.post('/register-process', function(req, res, next) {
+  console.log(req.body);
+    connection.query('INSERT INTO user_regristration (email, password, first_name, last_name, phone, company_name, street_address, state, country, industry, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [req.body.email,req.body.password, req.body.first_name,req.body.last_name,req.body.phone,req.body.company_name,req.body.street_address,req.body.state,req.body.country,req.body.industry,req.body.user_type],function(err, result) {
+
+      req.session.logged_in=true;
+      req.session.email=req.body.email;
+      req.session.user_id=result.insertId;
+      req.session.user_type=req.body.user_type;
+
+      if(req.body.user_type=="manufacturer"){
+        res.redirect('/Manufacturer');
+      }else{
+        res.redirect('/buyer');
+      }
+
+    });
+
+
+
+
+});
+
+
+
+router.post('/requestproject', function(req, res, next) {
+
+console.log(req.session);
+
+res.render('UserLandingPage');
+//    connection.query('post INTO intakeforms (first_name,last_name, email,phone,company_name,asking price,comments,Quantitys) values(req.body.First Name, req.body Last Name req.body.email, req.body.phone, req.body.company_name, req.body asking price, req.body comments, req. body Quantitys, req.body country,req.body industry, req.body radio ');
+});
+
+
+router.get('/login', function(req, res, next){
+
+  res.render('login', { title: 'Sign In' });
+
+});
+
+
+
+router.post('/login-process', function(req, res, next){
+
+//res.send("Got form")
+//  res.render('login', { title: 'Sign In' });
+
+///  Get the login form contents
+console.log(req.body);
+
+/// Check if the username and password is in the data to see if this is a valid user
+connection.query("SELECT * FROM user_regristration WHERE email=? AND password=?", [req.body.email, req.body.password], function(err,result){
+
+console.log(err)
+console.log(result);
+
+if(result.length>0){
+        /// If it is a valid user then show them either the manufacturer page or the creator custom page
+        req.session.logged_in=true;
+        req.session.email=result[0].email;
+        req.session.user_id=result[0].id;
+        req.session.user_type=result[0].user_type;
+
+        if(result[0].user_type=="manufacturer"){
+          console.log("got manu")
+          res.redirect('/Manufacturer');
+        }
+        if(result[0].user_type=="creator"){
+          res.redirect('/buyer')
+        }
+
+}else{
+/// If it is not a valid send them back to the login page (/login)
+res.render('login',{user_message:"Invalid Login. Please try again"})
+}
+
+});
+
+
+
+});
 
 
 module.exports = router;
